@@ -1,328 +1,657 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Finance Audit - Mobile</title>
-  <style>
-    body{font-family:Arial, sans-serif;margin:0;padding:0;background:#f5f5f5;color:#222}
-    .container{max-width:600px;margin:20px auto;background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-    h2{text-align:center;margin-top:0}
-    .row{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;align-items:center}
-    .row label{flex:1;font-size:14px;color:#555}
-    .row input, .row select, .summary-value{flex:1.5;padding:6px;border:1px solid #ccc;border-radius:4px;text-align:right;font-size:14px}
-    .summary-value {
-      border: none;
-      background: transparent;
-      font-weight: bold;
-      color: #111;
-      padding-right: 6px;
-      text-align: right;
-    }
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{text-align:right;padding:8px;border-bottom:1px solid #eee}
-    th:first-child,td:first-child{text-align:left}
-    input.count{width:80px;padding:4px;border:1px solid #ccc;border-radius:4px;text-align:right}
-    input.total{width:100px;border:none;background:transparent;text-align:right;font-weight:bold}
-    .summary-container {
-      margin-top: 20px;
-      border-top: 1px solid #ddd;
-      padding-top: 15px;
-    }
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .summary-row label {
-      flex: 1;
-      font-weight: 600;
-      color: #444;
-      font-size: 15px;
-    }
-    .summary-row input[type="number"] {
-      flex: 1.5;
-      padding: 6px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 14px;
-      text-align: right;
-      color: #222;
-    }
-    .summary-row .summary-value {
-      flex: 1.5;
-      font-weight: 700;
-      font-size: 15px;
-      color: #111;
-      text-align: right;
-    }
-    .signs{display:flex;justify-content:space-between;margin-top:20px}
-    .sign-box{width:48%;height:50px;border:1px dashed #aaa;border-radius:4px;text-align:center;font-size:12px;color:#777;display:flex;align-items:center;justify-content:center}
-    /* Variation color */
-    #variation.green {
-      color: #16a34a;
-      font-weight: 800;
-    }
-    #variation.red {
-      color: #dc2626;
-      font-weight: 800;
-    }
-    /* Buttons container */
-    .btn-container {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 25px;
-      gap: 10px;
-    }
-    button {
-      flex: 1;
-      padding: 10px 15px;
-      font-size: 15px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      background-color: #2563eb;
-      color: white;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #1d4ed8;
-    }
-  </style>
-</head>
-<body>
-  <div class="container" id="auditContent">
-    <h2>FINANCE AUDIT</h2>
-
-    <div class="row">
-      <label for="outlet">Outlet Name</label>
-      <select id="outlet">
-        <option value="">Select Outlet</option>
-        <option>AL JABER</option>
-        <option>AL MAFRAQ</option>
-        <option>AL NASER</option>
-        <option>AL RAYAN</option>
-        <option>CORNICHE</option>
-        <option>HAMDAN</option>
-        <option>HAMIM</option>
-        <option>ICAD</option>
-        <option>KHALIDIYAH</option>
-        <option>KHALIFA CITY</option>
-        <option>M 37</option>
-        <option>ME 10</option>
-        <option>ME 11</option>
-        <option>RAHA</option>
-        <option>TCA</option>
-        <option>SHAWAMEKH</option>
-        <option>WORKERS VILLAGE</option>
-        <option>VILLAGE MALL</option>
-        <option>NMDC</option>
-        <option>RIYAD CITY</option>
-        <option>SHAWAMEKH MALL</option>
-      </select>
-    </div>
-
-    <div class="row">
-      <label for="date">Date</label>
-      <input type="date" id="date">
-    </div>
-
-    <table id="auditTable">
-      <thead>
-        <tr>
-          <th>Currency</th>
-          <th>Count</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-
-    <div class="summary-container">
-      <div class="summary-row">
-        <label>Grand total</label>
-        <div class="summary-value" id="grandTotal">0.00</div>
-      </div>
-      <div class="summary-row">
-        <label for="sale">Sale</label>
-        <input type="number" id="sale" step="0.01" value="0" min="0">
-      </div>
-      <div class="summary-row">
-        <label>Net (Grand - Sale)</label>
-        <div class="summary-value" id="net">0.00</div>
-      </div>
-      <div class="summary-row">
-        <label for="till">Till Amount</label>
-        <input type="number" id="till" step="0.01" value="0" min="0">
-      </div>
-      <div class="summary-row">
-        <label>Variation (Net - Till)</label>
-        <div class="summary-value" id="variation">0.00</div>
-      </div>
-    </div>
-
-    <div class="signs">
-      <div class="sign-box">Cashier Sign</div>
-      <div class="sign-box">Audit Sign</div>
-    </div>
-
-    <div class="btn-container">
-      <button id="exportPdfBtn">Export to PDF</button>
-      <button id="mailBtn">Mail</button>
-    </div>
-  </div>
-
-  <!-- jsPDF CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <script>
-    const denominations = [1000,500,200,100,50,20,10,5,1,0.5,0.25];
-    const tbody = document.querySelector('#auditTable tbody');
-
-    function createRow(value){
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${value}</td>
-        <td><input class="count" type="number" min="0" value="0"></td>
-        <td><input class="total" type="text" value="0.00" readonly></td>
-      `;
-      tbody.appendChild(tr);
-    }
-
-    denominations.forEach(d => createRow(d));
-
-    function parseNum(val){
-      const n = Number(val);
-      return isNaN(n)?0:n;
-    }
-
-    function recalc(){
-      let grand = 0;
-      tbody.querySelectorAll('tr').forEach((row, i)=>{
-        const count = parseNum(row.querySelector('.count').value);
-        const total = denominations[i] * count;
-        row.querySelector('.total').value = total.toFixed(2);
-        grand += total;
-      });
-
-      document.getElementById('grandTotal').textContent = grand.toFixed(2);
-      const sale = parseNum(document.getElementById('sale').value);
-      const net = grand - sale;
-      document.getElementById('net').textContent = net.toFixed(2);
-      const till = parseNum(document.getElementById('till').value);
-      const variation = net - till;
-      const variationElem = document.getElementById('variation');
-      variationElem.textContent = variation.toFixed(2);
-
-      // Color variation positive green, negative red, zero black
-      variationElem.classList.remove('green','red');
-      if (variation > 0) variationElem.classList.add('green');
-      else if (variation < 0) variationElem.classList.add('red');
-    }
-
-    tbody.addEventListener('input', recalc);
-    document.getElementById('sale').addEventListener('input', recalc);
-    document.getElementById('till').addEventListener('input', recalc);
-
-    // Export PDF
-    document.getElementById('exportPdfBtn').addEventListener('click', async () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      const content = document.getElementById('auditContent');
-
-      // Simple text export: you can customize this part to format better
-      let y = 10;
-      doc.setFontSize(18);
-      doc.text("Finance Audit Report", 105, y, null, null, "center");
-
-      y += 10;
-      const outlet = document.getElementById('outlet').value || "N/A";
-      const date = document.getElementById('date').value || "N/A";
-      doc.setFontSize(12);
-      doc.text(`Outlet Name: ${outlet}`, 10, y);
-      doc.text(`Date: ${date}`, 150, y);
-      y += 10;
-
-      doc.text("Currency Count and Totals:", 10, y);
-      y += 8;
-
-      // Table headers
-      doc.text("Currency", 10, y);
-      doc.text("Count", 70, y);
-      doc.text("Total", 130, y);
-      y += 6;
-
-      tbody.querySelectorAll('tr').forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const currency = cells[0].textContent;
-        const count = cells[1].querySelector('input').value;
-        const total = cells[2].querySelector('input').value;
-
-        doc.text(currency, 10, y);
-        doc.text(count.toString(), 70, y);
-        doc.text(total.toString(), 130, y);
-        y += 6;
-      });
-
-      y += 8;
-      // Summary
-      const grandTotal = document.getElementById('grandTotal').textContent;
-      const sale = document.getElementById('sale').value;
-      const net = document.getElementById('net').textContent;
-      const till = document.getElementById('till').value;
-      const variation = document.getElementById('variation').textContent;
-
-      doc.text(`Grand Total: ${grandTotal}`, 10, y);
-      y += 6;
-      doc.text(`Sale: ${sale}`, 10, y);
-      y += 6;
-      doc.text(`Net (Grand - Sale): ${net}`, 10, y);
-      y += 6;
-      doc.text(`Till Amount: ${till}`, 10, y);
-      y += 6;
-      doc.text(`Variation (Net - Till): ${variation}`, 10, y);
-
-      y += 15;
-      doc.text("Signatures:", 10, y);
-      y += 6;
-      doc.text("Cashier Sign: ____________________", 10, y);
-      y += 8;
-      doc.text("Audit Sign: _______________________", 10, y);
-
-      doc.save(`FinanceAudit_${outlet}_${date}.pdf`);
-    });
-
-    // Mail button (opens default mail client with pre-filled subject and body)
-    document.getElementById('mailBtn').addEventListener('click', () => {
-      const outlet = document.getElementById('outlet').value || "N/A";
-      const date = document.getElementById('date').value || "N/A";
-      const grandTotal = document.getElementById('grandTotal').textContent;
-      const sale = document.getElementById('sale').value;
-      const net = document.getElementById('net').textContent;
-      const till = document.getElementById('till').value;
-      const variation = document.getElementById('variation').textContent;
-
-      const subject = encodeURIComponent(`Finance Audit Report - ${outlet} - ${date}`);
-      const bodyLines = [
-        `Outlet Name: ${outlet}`,
-        `Date: ${date}`,
-        "",
-        `Grand Total: ${grandTotal}`,
-        `Sale: ${sale}`,
-        `Net (Grand - Sale): ${net}`,
-        `Till Amount: ${till}`,
-        `Variation (Net - Till): ${variation}`,
-        "",
-        "Please find the Finance Audit Report attached (if applicable)."
-      ];
-      const body = encodeURIComponent(bodyLines.join("\n"));
-
-      // Open mail client with pre-filled subject and body (attachment not possible via mailto)
-      window.location.href = `mailto:?subject=${subject}&body=${body}`;
-    });
-  </script>
-</body>
-</html>
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Finance Audit - Mobile</title>
+
+  <style>
+
+    body{font-family:Arial, sans-serif;margin:0;padding:0;background:#f5f5f5;color:#222}
+
+    .container{max-width:600px;margin:20px auto;background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+
+    h2{text-align:center;margin-top:0}
+
+    .row{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;align-items:center}
+
+    .row label{flex:1;font-size:14px;color:#555}
+
+    .row input, .row select, .summary-value{flex:1.5;padding:6px;border:1px solid #ccc;border-radius:4px;text-align:right;font-size:14px}
+
+    .summary-value {
+
+      border: none;
+
+      background: transparent;
+
+      font-weight: bold;
+
+      color: #111;
+
+      padding-right: 6px;
+
+      text-align: right;
+
+    }
+
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+
+    th,td{text-align:right;padding:8px;border-bottom:1px solid #eee}
+
+    th:first-child,td:first-child{text-align:left}
+
+    input.count{width:80px;padding:4px;border:1px solid #ccc;border-radius:4px;text-align:right}
+
+    input.total{width:100px;border:none;background:transparent;text-align:right;font-weight:bold}
+
+    .summary-container {
+
+      margin-top: 20px;
+
+      border-top: 1px solid #ddd;
+
+      padding-top: 15px;
+
+    }
+
+    .summary-row {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-bottom: 12px;
+
+    }
+
+    .summary-row label {
+
+      flex: 1;
+
+      font-weight: 600;
+
+      color: #444;
+
+      font-size: 15px;
+
+    }
+
+    .summary-row input[type="number"] {
+
+      flex: 1.5;
+
+      padding: 6px;
+
+      border: 1px solid #ccc;
+
+      border-radius: 4px;
+
+      font-size: 14px;
+
+      text-align: right;
+
+      color: #222;
+
+    }
+
+    .summary-row .summary-value {
+
+      flex: 1.5;
+
+      font-weight: 700;
+
+      font-size: 15px;
+
+      color: #111;
+
+      text-align: right;
+
+    }
+
+    .signs{display:flex;justify-content:space-between;margin-top:20px}
+
+    .sign-box{width:48%;height:50px;border:1px dashed #aaa;border-radius:4px;text-align:center;font-size:12px;color:#777;display:flex;align-items:center;justify-content:center}
+
+    /* Variation color */
+
+    #variation.green {
+
+      color: #16a34a;
+
+      font-weight: 800;
+
+    }
+
+    #variation.red {
+
+      color: #dc2626;
+
+      font-weight: 800;
+
+    }
+
+    /* Buttons container */
+
+    .btn-container {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      margin-top: 25px;
+
+      gap: 10px;
+
+    }
+
+    button {
+
+      flex: 1;
+
+      padding: 10px 15px;
+
+      font-size: 15px;
+
+      border-radius: 6px;
+
+      border: none;
+
+      cursor: pointer;
+
+      background-color: #2563eb;
+
+      color: white;
+
+      transition: background-color 0.3s ease;
+
+    }
+
+    button:hover {
+
+      background-color: #1d4ed8;
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container" id="auditContent">
+
+    <h2>FINANCE AUDIT(Checkout) </h2>
+
+
+
+    <div class="row">
+
+      <label for="outlet">Outlet Name</label>
+
+      <select id="outlet">
+
+        <option value="">Select Outlet</option>
+
+        <option>AL JABER</option>
+
+        <option>AL MAFRAQ</option>
+
+        <option>AL NASER</option>
+
+        <option>AL RAYAN</option>
+
+        <option>CORNICHE</option>
+
+        <option>HAMDAN</option>
+
+        <option>HAMIM</option>
+
+        <option>ICAD</option>
+
+        <option>KHALIDIYAH</option>
+
+        <option>KHALIFA CITY</option>
+
+        <option>M 37</option>
+
+        <option>ME 10</option>
+
+        <option>ME 11</option>
+
+        <option>RAHA</option>
+
+        <option>TCA</option>
+
+        <option>SHAWAMEKH</option>
+
+        <option>WORKERS VILLAGE</option>
+
+        <option>VILLAGE MALL</option>
+
+        <option>NMDC</option>
+
+        <option>RIYAD CITY</option>
+
+        <option>SHAWAMEKH MALL</option>
+
+      </select>
+
+    </div>
+
+
+
+    <div class="row">
+
+      <label for="date">Date</label>
+
+      <input type="date" id="date">
+
+    </div>
+
+
+
+    <table id="auditTable">
+
+      <thead>
+
+        <tr>
+
+          <th>Currency</th>
+
+          <th>Count</th>
+
+          <th>Total</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+      </tbody>
+
+    </table>
+
+
+
+    <div class="summary-container">
+
+      <div class="summary-row">
+
+        <label>Grand total</label>
+
+        <div class="summary-value" id="grandTotal">0.00</div>
+
+      </div>
+
+      <div class="summary-row">
+
+        <label for="sale">Sale</label>
+
+        <input type="number" id="sale" step="0.01" value="0" min="0">
+
+      </div>
+
+      <div class="summary-row">
+
+        <label>Net (Grand - Sale)</label>
+
+        <div class="summary-value" id="net">0.00</div>
+
+      </div>
+
+      <div class="summary-row">
+
+        <label for="till">Till Amount</label>
+
+        <input type="number" id="till" step="0.01" value="0" min="0">
+
+      </div>
+
+      <div class="summary-row">
+
+        <label>Variation (Net - Till)</label>
+
+        <div class="summary-value" id="variation">0.00</div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="signs">
+
+      <div class="sign-box">Cashier Sign</div>
+
+      <div class="sign-box">Audit Sign</div>
+
+    </div>
+
+
+
+    <div class="btn-container">
+
+      <button id="exportPdfBtn">Export to PDF</button>
+
+      <button id="mailBtn">Mail</button>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- jsPDF CDN -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+
+  <script>
+
+    const denominations = [1000,500,200,100,50,20,10,5,1,0.5,0.25];
+
+    const tbody = document.querySelector('#auditTable tbody');
+
+
+
+    function createRow(value){
+
+      const tr = document.createElement('tr');
+
+      tr.innerHTML = `
+
+        <td>${value}</td>
+
+        <td><input class="count" type="number" min="0" value="0"></td>
+
+        <td><input class="total" type="text" value="0.00" readonly></td>
+
+      `;
+
+      tbody.appendChild(tr);
+
+    }
+
+
+
+    denominations.forEach(d => createRow(d));
+
+
+
+    function parseNum(val){
+
+      const n = Number(val);
+
+      return isNaN(n)?0:n;
+
+    }
+
+
+
+    function recalc(){
+
+      let grand = 0;
+
+      tbody.querySelectorAll('tr').forEach((row, i)=>{
+
+        const count = parseNum(row.querySelector('.count').value);
+
+        const total = denominations[i] * count;
+
+        row.querySelector('.total').value = total.toFixed(2);
+
+        grand += total;
+
+      });
+
+
+
+      document.getElementById('grandTotal').textContent = grand.toFixed(2);
+
+      const sale = parseNum(document.getElementById('sale').value);
+
+      const net = grand - sale;
+
+      document.getElementById('net').textContent = net.toFixed(2);
+
+      const till = parseNum(document.getElementById('till').value);
+
+      const variation = net - till;
+
+      const variationElem = document.getElementById('variation');
+
+      variationElem.textContent = variation.toFixed(2);
+
+
+
+      // Color variation positive green, negative red, zero black
+
+      variationElem.classList.remove('green','red');
+
+      if (variation > 0) variationElem.classList.add('green');
+
+      else if (variation < 0) variationElem.classList.add('red');
+
+    }
+
+
+
+    tbody.addEventListener('input', recalc);
+
+    document.getElementById('sale').addEventListener('input', recalc);
+
+    document.getElementById('till').addEventListener('input', recalc);
+
+
+
+    // Export PDF
+
+    document.getElementById('exportPdfBtn').addEventListener('click', async () => {
+
+      const { jsPDF } = window.jspdf;
+
+      const doc = new jsPDF();
+
+
+
+      const content = document.getElementById('auditContent');
+
+
+
+      // Simple text export: you can customize this part to format better
+
+      let y = 10;
+
+      doc.setFontSize(18);
+
+      doc.text("Finance Audit Report", 105, y, null, null, "center");
+
+
+
+      y += 10;
+
+      const outlet = document.getElementById('outlet').value || "N/A";
+
+      const date = document.getElementById('date').value || "N/A";
+
+      doc.setFontSize(12);
+
+      doc.text(`Outlet Name: ${outlet}`, 10, y);
+
+      doc.text(`Date: ${date}`, 150, y);
+
+      y += 10;
+
+
+
+      doc.text("Currency Count and Totals:", 10, y);
+
+      y += 8;
+
+
+
+      // Table headers
+
+      doc.text("Currency", 10, y);
+
+      doc.text("Count", 70, y);
+
+      doc.text("Total", 130, y);
+
+      y += 6;
+
+
+
+      tbody.querySelectorAll('tr').forEach(row => {
+
+        const cells = row.querySelectorAll('td');
+
+        const currency = cells[0].textContent;
+
+        const count = cells[1].querySelector('input').value;
+
+        const total = cells[2].querySelector('input').value;
+
+
+
+        doc.text(currency, 10, y);
+
+        doc.text(count.toString(), 70, y);
+
+        doc.text(total.toString(), 130, y);
+
+        y += 6;
+
+      });
+
+
+
+      y += 8;
+
+      // Summary
+
+      const grandTotal = document.getElementById('grandTotal').textContent;
+
+      const sale = document.getElementById('sale').value;
+
+      const net = document.getElementById('net').textContent;
+
+      const till = document.getElementById('till').value;
+
+      const variation = document.getElementById('variation').textContent;
+
+
+
+      doc.text(`Grand Total: ${grandTotal}`, 10, y);
+
+      y += 6;
+
+      doc.text(`Sale: ${sale}`, 10, y);
+
+      y += 6;
+
+      doc.text(`Net (Grand - Sale): ${net}`, 10, y);
+
+      y += 6;
+
+      doc.text(`Till Amount: ${till}`, 10, y);
+
+      y += 6;
+
+      doc.text(`Variation (Net - Till): ${variation}`, 10, y);
+
+
+
+      y += 15;
+
+      doc.text("Signatures:", 10, y);
+
+      y += 6;
+
+      doc.text("Cashier Sign: ____________________", 10, y);
+
+      y += 8;
+
+      doc.text("Audit Sign: _______________________", 10, y);
+
+
+
+      doc.save(`FinanceAudit_${outlet}_${date}.pdf`);
+
+    });
+
+
+
+    // Mail button (opens default mail client with pre-filled subject and body)
+
+    document.getElementById('mailBtn').addEventListener('click', () => {
+
+      const outlet = document.getElementById('outlet').value || "N/A";
+
+      const date = document.getElementById('date').value || "N/A";
+
+      const grandTotal = document.getElementById('grandTotal').textContent;
+
+      const sale = document.getElementById('sale').value;
+
+      const net = document.getElementById('net').textContent;
+
+      const till = document.getElementById('till').value;
+
+      const variation = document.getElementById('variation').textContent;
+
+
+
+      const subject = encodeURIComponent(`Finance Audit Report - ${outlet} - ${date}`);
+
+      const bodyLines = [
+
+        `Outlet Name: ${outlet}`,
+
+        `Date: ${date}`,
+
+        "",
+
+        `Grand Total: ${grandTotal}`,
+
+        `Sale: ${sale}`,
+
+        `Net (Grand - Sale): ${net}`,
+
+        `Till Amount: ${till}`,
+
+        `Variation (Net - Till): ${variation}`,
+
+        "",
+
+        "Please find the Finance Audit Report attached (if applicable)."
+
+      ];
+
+      const body = encodeURIComponent(bodyLines.join("\n"));
+
+
+
+      // Open mail client with pre-filled subject and body (attachment not possible via mailto)
+
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+
+    });
+
+  </script>
+
+</body>
+
+</html>
+
+
