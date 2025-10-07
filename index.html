@@ -27,6 +27,19 @@
     h2 {
       text-align: center;
       margin-top: 0;
+      font-size: 22px;
+    }
+
+    /* Enlarged logo styling */
+    .logo-container {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .logo-container img {
+      width: 80%;       /* roughly matches heading width */
+      max-width: 350px; /* scales gracefully on desktop */
+      height: auto;
     }
 
     .row {
@@ -193,10 +206,9 @@
 
 <body>
   <div class="container" id="auditContent">
-    <div style="text-align:center; margin-bottom:10px;">
+    <div class="logo-container">
       <img src="https://github.com/muhammedmusthafa6959/Audit/blob/main/unnamed.webp?raw=true"
-           alt="Company Logo"
-           style="max-width:120px; height:auto;">
+           alt="Company Logo">
     </div>
 
     <h2>FINANCE AUDIT (Checkout)</h2>
@@ -329,95 +341,6 @@
     tbody.addEventListener('input', recalc);
     document.getElementById('sale').addEventListener('input', recalc);
     document.getElementById('till').addEventListener('input', recalc);
-
-    document.getElementById('exportPdfBtn').addEventListener('click', async () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      let y = 10;
-      doc.setFontSize(18);
-      doc.text("Finance Audit Report", 105, y, null, null, "center");
-
-      y += 10;
-      const outlet = document.getElementById('outlet').value || "N/A";
-      const date = document.getElementById('date').value || "N/A";
-      doc.setFontSize(12);
-      doc.text(`Outlet Name: ${outlet}`, 10, y);
-      doc.text(`Date: ${date}`, 150, y);
-      y += 10;
-
-      doc.text("Currency Count and Totals:", 10, y);
-      y += 8;
-
-      doc.text("Currency", 10, y);
-      doc.text("Count", 70, y);
-      doc.text("Total", 130, y);
-      y += 6;
-
-      tbody.querySelectorAll('tr').forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const currency = cells[0].textContent;
-        const count = cells[1].querySelector('input').value;
-        const total = cells[2].querySelector('input').value;
-
-        doc.text(currency, 10, y);
-        doc.text(count.toString(), 70, y);
-        doc.text(total.toString(), 130, y);
-        y += 6;
-      });
-
-      y += 8;
-      const grandTotal = document.getElementById('grandTotal').textContent;
-      const sale = document.getElementById('sale').value;
-      const net = document.getElementById('net').textContent;
-      const till = document.getElementById('till').value;
-      const variation = document.getElementById('variation').textContent;
-
-      doc.text(`Grand Total: ${grandTotal}`, 10, y);
-      y += 6;
-      doc.text(`Sale: ${sale}`, 10, y);
-      y += 6;
-      doc.text(`Net (Grand - Sale): ${net}`, 10, y);
-      y += 6;
-      doc.text(`Till Amount: ${till}`, 10, y);
-      y += 6;
-      doc.text(`Variation (Net - Till): ${variation}`, 10, y);
-
-      y += 15;
-      doc.text("Signatures:", 10, y);
-      y += 6;
-      doc.text("Cashier Sign: ____________________", 10, y);
-      y += 8;
-      doc.text("Audit Sign: _______________________", 10, y);
-
-      doc.save(`FinanceAudit_${outlet}_${date}.pdf`);
-    });
-
-    document.getElementById('mailBtn').addEventListener('click', () => {
-      const outlet = document.getElementById('outlet').value || "N/A";
-      const date = document.getElementById('date').value || "N/A";
-      const grandTotal = document.getElementById('grandTotal').textContent;
-      const sale = document.getElementById('sale').value;
-      const net = document.getElementById('net').textContent;
-      const till = document.getElementById('till').value;
-      const variation = document.getElementById('variation').textContent;
-
-      const subject = encodeURIComponent(`Finance Audit Report - ${outlet} - ${date}`);
-      const bodyLines = [
-        `Outlet Name: ${outlet}`,
-        `Date: ${date}`,
-        "",
-        `Grand Total: ${grandTotal}`,
-        `Sale: ${sale}`,
-        `Net (Grand - Sale): ${net}`,
-        `Till Amount: ${till}`,
-        `Variation (Net - Till): ${variation}`,
-        "",
-        "Please find the Finance Audit Report attached (if applicable)."
-      ];
-      const body = encodeURIComponent(bodyLines.join("\n"));
-      window.location.href = `mailto:?subject=${subject}&body=${body}`;
-    });
   </script>
 </body>
 </html>
